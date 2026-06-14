@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎂 生日贺卡 - 自定义你的祝福</title>
+    <style>
+        :root {
+            --bg: #fff5f7;
+            --card-bg: #ffffff;
+            --text: #4a3040;
+            --accent: #e8917e;
+            --accent2: #f4c2b8;
+            --gold: #d4a853;
+            --shadow: rgba(232, 145, 126, 0.2);
+            --particle-color1: #ff9aa2;
+            --particle-color2: #ffb7b2;
+            --particle-color3: #ffdac1;
+            --particle-color4: #e2f0cb;
+            --font-size: 16px;
+            --heading-size: 2.2em;
+        }
+
+        [data-theme="pink"] {
+            --bg: #fff5f7;
+            --card-bg: #ffffff;
+            --text: #4a3040;
+            --accent: #e8917e;
+            --accent2: #f4c2b8;
+            --gold: #d4a853;
+            --shadow: rgba(232, 145, 126, 0.25);
+            --particle-color1: #ff9aa2;
+            --particle-color2: #ffb7b2;
+            --particle-color3: #ffdac1;
+            --particle-color4: #ffe0e6;
+        }
+
+        [data-theme="blue"] {
+            --bg: #f0f5fa;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --accent: #5b9bd5;
+            --accent2: #a8d0f0;
+            --gold: #c9a96e;
+            --shadow: rgba(91, 155, 213, 0.25);
+            --particle-color1: #a8d8ea;
+            --particle-color2: #aa96da;
+            --particle-color3: #c3f0e8;
+            --particle-color4: #d4e7f5;
+        }
+
+        [data-theme="golden"] {
+            --bg: #fdfaf3;
+            --card-bg: #fffef9;
+            --text: #4a3728;
+            --accent: #c8963e;
+            --accent2: #e8d5a3;
+            --gold: #b8861f;
+            --shadow: rgba(200, 150, 62, 0.3);
+            --particle-color1: #f0d78c;
+            --particle-color2: #e8c56d;
+            --particle-color3: #f7e8b0;
+            --particle-color4: #fff3cd;
+        }
+
+        [data-theme="rainbow"] {
+            --bg: #fafafa;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --accent: #6c5ce7;
+            --accent2: #fd79a8;
+            --gold: #fdcb6e;
+            --shadow: rgba(108, 92, 231, 0.2);
+            --particle-color1: #ff6b6b;
+            --particle-color2: #feca57;
+            --particle-color3: #48dbfb;
+            --particle-color4: #ff9ff3;
+        }
+
+        [data-theme="forest"] {
+            --bg: #f6faf3;
+            --card-bg: #ffffff;
+            --text: #3a4a35;
+            --accent: #6b9b5b;
+            --accent2: #b5d5a8;
+            --gold: #c9a050;
+            --shadow: rgba(107, 155, 91, 0.25);
+            --particle-color1: #a8d5a2;
+            --particle-color2: #c9e8c0;
+            --particle-color3: #f0d5a0;
+            --particle-color4: #e8f0dc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: background 0.6s ease;
+            overflow-x: hidden;
+        }
+
+        /* 飘落粒子容器 */
+        #particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            top: -60px;
+            animation: fall linear infinite;
+            user-select: none;
+            pointer-events: none;
+            font-size: 28px;
+            opacity: 0.85;
+            will-change: transform;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-60px) rotate(0deg) scale(1);
+                opacity: 0.9;
+            }
+            20% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(50vh) rotate(180deg) scale(1.15);
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(105vh) rotate(360deg) scale(0.6);
+                opacity: 0;
+            }
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(110vh) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.9;
+            }
+            50% {
+                transform: translateY(45vh) rotate(200deg) scale(1.1);
+                opacity: 0.85;
+            }
+            85% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(-80px) rotate(380deg) scale(0.4);
+                opacity: 0;
+            }
+        }
+
+        .particle.rising {
+            animation: floatUp linear infinite;
+        }
+
+        /* 主布局 */
+        .main-container {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 1;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        /* 贺卡 */
+        .card-wrapper {
+            perspective: 1200px;
+            flex: 1 1 420px;
+            max-width: 520px;
+            min-width: 340px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 22px;
+            padding: 36px 32px 40px;
+            text-align: center;
+            box-shadow: 0 20px 55px var(--shadow), 0 4px 16px rgba(0, 0, 0, 0.06);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            color: var(--text);
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2), var(--gold), var(--accent));
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: borderGlow 4s ease infinite;
+            opacity: 0.7;
+            transition: opacity 0.5s;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes borderGlow {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 100% 0%;
+            }
+            50% {
+                background-position: 100% 100%;
+            }
+            75% {
+                background-position: 0% 100%;
+            }
+        }
+
+        .card .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: sparkleFloat 2.5s ease-in-out infinite;
+            pointer-events: none;
+            box-shadow: 0 0 10px var(--gold), 0 0 20px var(--accent2);
+        }
+
+        @keyframes sparkleFloat {
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-18px) scale(1.8);
+                opacity: 1;
+            }
+        }
+
+        .card .icon-top {
+            font-size: 60px;
+            display: block;
+            margin-bottom: 6px;
+            animation: bounceIcon 1.2s ease-in-out infinite;
+            cursor: default;
+        }
+
+        @keyframes bounceIcon {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-18px);
+            }
+            50% {
+                transform: translateY(0);
+            }
+            70% {
+                transform: translateY(-8px);
+            }
+            85% {
+                transform: translateY(0);
+            }
+        }
+
+        .card .recipient-name {
+            font-size: var(--heading-size);
+            font-weight: 700;
+            color: var(--accent);
+            margin: 8px 0 4px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .card .greeting-label {
+            font-size: 0.9em;
+            color: var(--accent2);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+
+        .card .message {
+            font-size: var(--font-size);
+            line-height: 1.8;
+            margin: 18px 0 14px;
+            color: var(--text);
+            transition: all 0.3s;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .card .signature {
+            font-style: italic;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        .card .decorative-line {
+            width: 70px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent2));
+            margin: 12px auto;
+            border-radius: 10px;
+        }
+
+        .card .age-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1em;
+            letter-spacing: 2px;
+            margin-top: 6px;
+            box-shadow: 0 6px 18px var(--shadow);
+            transition: all 0.3s;
+        }
+
+        /* 控制面板 */
+        .panel {
+            flex: 0 0 320px;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 26px 22px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            z-index: 1;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 20px;
+            border: 1px solid #eee;
+        }
+
+        .panel h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            color: #444;
+            letter-spacing: 2px;
+        }
+        .panel h3 span {
+            font-size: 1.4em;
+        }
+
+        .panel label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+            margin-top: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .panel label:first-of-type {
+            margin-top: 0;
+        }
+
+        .panel input[type="text"],
+        .panel textarea,
+        .panel select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e8e8e8;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: #fafafa;
+            resize: vertical;
+            color: #333;
+        }
+        .panel textarea {
+            min-height: 70px;
+            max-height: 140px;
+        }
+        .panel input:focus,
+        .panel textarea:focus,
+        .panel select:focus {
+            outline: none;
+            border-color: var(--accent, #e8917e);
+            box-shadow: 0 0 0 4px rgba(232, 145, 126, 0.1);
+            background: #fff;
+        }
+
+        .theme-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .theme-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .theme-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        .theme-btn.active {
+            border-color: #333;
+            box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.12);
+            transform: scale(1.1);
+        }
+        .theme-btn.pink {
+            background: linear-gradient(135deg, #ff9aa2, #f4c2b8);
+        }
+        .theme-btn.blue {
+            background: linear-gradient(135deg, #5b9bd5, #a8d0f0);
+        }
+        .theme-btn.golden {
+            background: linear-gradient(135deg, #d4a853, #f0d78c);
+        }
+        .theme-btn.rainbow {
+            background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+        }
+        .theme-btn.forest {
+            background: linear-gradient(135deg, #6b9b5b, #b5d5a8);
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .toggle-row span {
+            font-size: 0.9em;
+            color: #555;
+            font-weight: 500;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ccc;
+            border-radius: 28px;
+            transition: 0.35s;
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.35s;
+        }
+        input:checked+.toggle-slider {
+            background: var(--accent, #e8917e);
+        }
+        input:checked+.toggle-slider::before {
+            transform: translateX(22px);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            font-family: inherit;
+            min-width: 80px;
+        }
+        .btn-primary {
+            background: var(--accent, #e8917e);
+            color: #fff;
+            box-shadow: 0 6px 20px var(--shadow, rgba(232, 145, 126, 0.3));
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px var(--shadow, rgba(232, 145, 126, 0.4));
+            filter: brightness(1.08);
+        }
+        .btn-outline {
+            background: #fff;
+            color: var(--accent, #e8917e);
+            border: 2px solid var(--accent, #e8917e);
+        }
+        .btn-outline:hover {
+            background: var(--accent, #e8917e);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .panel .hint {
+            font-size: 0.75em;
+            color: #aaa;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .panel {
+                position: static;
+                max-height: none;
+                flex: 0 0 auto;
+                width: 100%;
+                max-width: 500px;
+                order: 2;
+            }
+            .card-wrapper {
+                order: 1;
+                max-width: 100%;
+                min-width: auto;
+            }
+            .card {
+                padding: 24px 18px 28px;
+            }
+            .card .icon-top {
+                font-size: 44px;
+            }
+            .card .recipient-name {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body data-theme="pink">
+
+    <!-- 飘落粒子 -->
+    <div id="particles-container"></div>
+
+    <!-- 主布局 -->
+    <div class="main-container">
+        <!-- 贺卡 -->
+        <div class="card-wrapper">
+            <div class="card" id="birthdayCard">
+                <!-- 动态闪光点 -->
+                <span class="icon-top" id="cardIcon">🎂</span>
+                <div class="greeting-label" id="greetingLabel">✨ 生日快乐 ✨</div>
+                <div class="recipient-name" id="recipientNameDisplay">亲爱的朋友</div>
+                <div class="decorative-line"></div>
+                <div class="message" id="messageDisplay">
+                    愿你的每一天都充满阳光和欢笑，<br>每一个梦想都能绽放光芒。<br>祝你生日快乐，幸福永远！🎉
+                </div>
+                <div class="age-badge" id="ageBadge">🎈 永远18岁</div>
+                <div class="signature" id="signatureDisplay">— 爱你的朋友</div>
+            </div>
+        </div>
+
+        <!-- 控制面板 -->
+        <div class="panel" id="controlPanel">
+            <h3><span>🎨</span> 定制你的贺卡</h3>
+
+            <label>📝 收件人名字</label>
+            <input type="text" id="recipientInput" value="亲爱的朋友" placeholder="输入名字...">
+
+            <label>💬 祝福语</label>
+            <textarea id="messageInput" placeholder="写下你的祝福...">愿你的每一天都充满阳光和欢笑，&#10;每一个梦想都能绽放光芒。&#10;祝你生日快乐，幸福永远！🎉</textarea>
+
+            <label>✍️ 署名</label>
+            <input type="text" id="signatureInput" value="爱你的朋友" placeholder="你的署名...">
+
+            <label>🎯 年龄/标签</label>
+            <input type="text" id="ageInput" value="永远18岁" placeholder="如：18岁、永远年轻...">
+
+            <label>🎨 主题配色</label>
+            <div class="theme-buttons" id="themeButtons">
+                <button class="theme-btn pink active" data-theme="pink" title="粉色浪漫"></button>
+                <button class="theme-btn blue" data-theme="blue" title="蓝色清新"></button>
+                <button class="theme-btn golden" data-theme="golden" title="金色华贵"></button>
+                <button class="theme-btn rainbow" data-theme="rainbow" title="彩虹活力"></button>
+                <button class="theme-btn forest" data-theme="forest" title="森林自然"></button>
+            </div>
+
+            <label>🎭 顶部图标</label>
+            <select id="iconSelect">
+                <option value="🎂">🎂 生日蛋糕</option>
+                <option value="🎉">🎉 庆祝</option>
+                <option value="🎁">🎁 礼物</option>
+                <option value="🎈">🎈 气球</option>
+                <option value="🌟">🌟 星星</option>
+                <option value="💖">💖 爱心</option>
+                <option value="🦄">🦄 独角兽</option>
+                <option value="🌸">🌸 花朵</option>
+                <option value="🎵">🎵 音乐</option>
+                <option value="🍰">🍰 蛋糕</option>
+            </select>
+
+            <div class="toggle-row">
+                <span>✨ 飘落特效</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="particlesToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <span>🎵 背景音乐提示</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="musicHintToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <span>💫 卡片闪光边框</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="glowBorderToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" id="btnPreview">👁️ 预览更新</button>
+                <button class="btn btn-outline" id="btnReset">🔄 恢复默认</button>
+            </div>
+            <div class="btn-row" style="margin-top:8px;">
+                <button class="btn btn-outline" id="btnScreenshot" style="flex:1;">📸 截图保存提示</button>
+            </div>
+            <p class="hint">💡 调整选项后点击"预览更新"查看效果<br>可按 <strong>Ctrl+P</strong> 打印或另存为PDF</p>
+        </div>
+    </div>
+
+    <!-- 隐藏的音频提示元素 -->
+    <div id="musicToast"
+        style="position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 24px;border-radius:30px;z-index:999;opacity:0;transition:opacity 0.5s;pointer-events:none;font-size:0.9em;letter-spacing:1px;box-shadow:0 8px 25px rgba(0,0,0,0.3);">
+        🎵 生日快乐歌正在播放中...
+    </div>
+
+    <script>
+        (function() {
+            // DOM元素
+            const body = document.body;
+            const card = document.getElementById('birthdayCard');
+            const recipientInput = document.getElementById('recipientInput');
+            const messageInput = document.getElementById('messageInput');
+            const signatureInput = document.getElementById('signatureInput');
+            const ageInput = document.getElementById('ageInput');
+            const iconSelect = document.getElementById('iconSelect');
+            const recipientNameDisplay = document.getElementById('recipientNameDisplay');
+            const messageDisplay = document.getElementById('messageDisplay');
+            const signatureDisplay = document.getElementById('signatureDisplay');
+            const ageBadge = document.getElementById('ageBadge');
+            const cardIcon = document.getElementById('cardIcon');
+            const greetingLabel = document.getElementById('greetingLabel');
+            const particlesContainer = document.getElementById('particles-container');
+            const particlesToggle = document.getElementById('particlesToggle');
+            const musicHintToggle = document.getElementById('musicHintToggle');
+            const glowBorderToggle = document.getElementById('glowBorderToggle');
+            const themeButtons = document.getElementById('themeButtons');
+            const btnPreview = document.getElementById('btnPreview');
+            const btnReset = document.getElementById('btnReset');
+            const btnScreenshot = document.getElementById('btnScreenshot');
+            const musicToast = document.getElementById('musicToast');
+
+            // 默认值
+            const defaults = {
+                recipient: '亲爱的朋友',
+                message: '愿你的每一天都充满阳光和欢笑，\n每一个梦想都能绽放光芒。\n祝你生日快乐，幸福永远！🎉',
+                signature: '爱你的朋友',
+                age: '永远18岁',
+                icon: '🎂',
+                theme: 'pink',
+                particles: true,
+                musicHint: false,
+                glowBorder: true,
+            };
+
+            let currentParticles = [];
+            let particleInterval = null;
+            let musicAudio = null;
+            let musicToastTimer = null;
+
+            // 初始化
+            function init() {
+                loadFromLocalStorage();
+                updateCardDisplay();
+                updateParticles();
+                updateGlowBorder();
+                setupEventListeners();
+                createSparkles();
+            }
+
+            // 从localStorage加载
+            function loadFromLocalStorage() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem('birthdayCardSettings'));
+                    if (saved) {
+                        recipientInput.value = saved.recipient || defaults.recipient;
+                        messageInput.value = saved.message || defaults.message;
+                        signatureInput.value = saved.signature || defaults.signature;
+                        ageInput.value = saved.age || defaults.age;
+                        iconSelect.value = saved.icon || defaults.icon;
+                        if (saved.theme) setTheme(saved.theme);
+                        if (saved.particles !== undefined) particlesToggle.checked = saved.particles;
+                        if (saved.musicHint !== undefined) musicHintToggle.checked = saved.musicHint;
+                        if (saved.glowBorder !== undefined) glowBorderToggle.checked = saved.glowBorder;
+                    } else {
+                        setTheme(defaults.theme);
+                        particlesToggle.checked = defaults.particles;
+                        musicHintToggle.checked = defaults.musicHint;
+                        glowBorderToggle.checked = defaults.glowBorder;
+                    }
+                } catch (e) {
+                    setTheme(defaults.theme);
+                    particlesToggle.checked = defaults.particles;
+                    musicHintToggle.checked = defaults.musicHint;
+                    glowBorderToggle.checked = defaults.glowBorder;
+                }
+            }
+
+            // 保存到localStorage
+            function saveToLocalStorage() {
+                const settings = {
+                    recipient: recipientInput.value,
+                    message: messageInput.value,
+                    signature: signatureInput.value,
+                    age: ageInput.value,
+                    icon: iconSelect.value,
+                    theme: body.getAttribute('data-theme') || 'pink',
+                    particles: particlesToggle.checked,
+                    musicHint: musicHintToggle.checked,
+                    glowBorder: glowBorderToggle.checked,
+                };
+                try {
+                    localStorage.setItem('birthdayCardSettings', JSON.stringify(settings));
+                } catch (e) {
+                    // localStorage不可用
+                }
+            }
+
+            // 设置主题
+            function setTheme(theme) {
+                body.setAttribute('data-theme', theme);
+                // 更新主题按钮active状态
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
+                });
+                // 更新CSS变量中的accent用于toggle等
+                updateDynamicStyles();
+            }
+
+            function updateDynamicStyles() {
+                const style = getComputedStyle(body);
+                const accent = style.getPropertyValue('--accent').trim();
+                document.documentElement.style.setProperty('--dynamic-accent', accent);
+            }
+
+            // 更新卡片显示
+            function updateCardDisplay() {
+                recipientNameDisplay.textContent = recipientInput.value || defaults.recipient;
+                const msg = messageInput.value || defaults.message;
+                messageDisplay.innerHTML = msg.replace(/\n/g, '<br>');
+                signatureDisplay.textContent = signatureInput.value || defaults.signature;
+                ageBadge.textContent = '🎈 ' + (ageInput.value || defaults.age);
+                cardIcon.textContent = iconSelect.value || defaults.icon;
+                // 根据图标更新问候标签
+                const icon = iconSelect.value;
+                if (icon === '🎂' || icon === '🍰') greetingLabel.textContent = '✨ 生日快乐 ✨';
+                else if (icon === '🎉') greetingLabel.textContent = '🎊 庆祝这一天 🎊';
+                else if (icon === '🎁') greetingLabel.textContent = '🎀 专属礼物 🎀';
+                else if (icon === '💖') greetingLabel.textContent = '💕 满满的爱 💕';
+                else if (icon === '🌟') greetingLabel.textContent = '⭐ 闪耀时刻 ⭐';
+                else greetingLabel.textContent = '✨ 生日快乐 ✨';
+            }
+
+            // 更新飘落粒子
+            function updateParticles() {
+                clearInterval(particleInterval);
+                // 清除现有粒子
+                currentParticles.forEach(p => p.remove());
+                currentParticles = [];
+                particlesContainer.innerHTML = '';
+
+                if (particlesToggle.checked) {
+                    createParticles();
+                    particleInterval = setInterval(() => {
+                        // 清理旧粒子
+                        const allParticles = particlesContainer.querySelectorAll('.particle');
+                        allParticles.forEach(p => {
+                            const rect = p.getBoundingClientRect();
+                            if (rect.top > window.innerHeight + 100 || rect.bottom < -100) {
+                                p.remove();
+                            }
+                        });
+                        // 补充新粒子
+                        if (particlesContainer.querySelectorAll('.particle').length < 40) {
+                            for (let i = 0; i < 6; i++) {
+                                createSingleParticle();
+                            }
+                        }
+                    }, 2500);
+                }
+            }
+
+            function createParticles() {
+                const count = 35;
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => createSingleParticle(), i * 150);
+                }
+            }
+
+            function createSingleParticle() {
+                const particle = document.createElement('span');
+                particle.classList.add('particle');
+                const emojis = ['🎈', '🎉', '🎊', '✨', '💫', '🌟', '💖', '🎀', '🧁', '🍰', '🎂', '🎁', '🌸', '🦋', '💐',
+                    '⭐', '💝', '🎵', '🌈', '💎'
+                ];
+                const colors = ['--particle-color1', '--particle-color2', '--particle-color3', '--particle-color4'];
+                const style = getComputedStyle(body);
+                const colorVar = colors[Math.floor(Math.random() * colors.length)];
+                const color = style.getPropertyValue(colorVar).trim();
+
+                particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                particle.style.left = Math.random() * 95 + '%';
+                particle.style.fontSize = (18 + Math.random() * 30) + 'px';
+                particle.style.animationDuration = (6 + Math.random() * 12) + 's';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.color = color;
+                particle.style.opacity = (0.6 + Math.random() * 0.4);
+
+                // 随机上升或下降
+                if (Math.random() < 0.35) {
+                    particle.classList.add('rising');
+                    particle.style.top = 'auto';
+                    particle.style.bottom = '-60px';
+                    particle.style.animationDuration = (7 + Math.random() * 14) + 's';
+                }
+
+                particlesContainer.appendChild(particle);
+                currentParticles.push(particle);
+            }
+
+            // 更新闪光边框
+            function updateGlowBorder() {
+                if (glowBorderToggle.checked) {
+                    card.style.setProperty('--border-opacity', '0.7');
+                    card.style.border = '3px solid transparent';
+                    card.style.backgroundClip = 'padding-box';
+                    // 恢复::before
+                    const beforeStyle = card.querySelector('style#glowStyle');
+                    if (beforeStyle) beforeStyle.remove();
+                } else {
+                    card.style.border = '3px solid #eee';
+                    // 禁用::before动画
+                    const styleEl = document.createElement('style');
+                    styleEl.id = 'glowStyle';
+                    styleEl.textContent = `
+                #birthdayCard::before { opacity: 0 !important; animation: none !important; background: transparent !important; }
+              `;
+                    card.appendChild(styleEl);
+                }
+            }
+
+            // 创建卡片上的闪光点
+            function createSparkles() {
+                // 移除旧闪光点
+                card.querySelectorAll('.sparkle').forEach(s => s.remove());
+                for (let i = 0; i < 8; i++) {
+                    const sparkle = document.createElement('span');
+                    sparkle.classList.add('sparkle');
+                    sparkle.style.top = (8 + Math.random() * 80) + '%';
+                    sparkle.style.left = (5 + Math.random() * 88) + '%';
+                    sparkle.style.animationDelay = Math.random() * 2.5 + 's';
+                    sparkle.style.animationDuration = (2 + Math.random() * 3) + 's';
+                    sparkle.style.width = (4 + Math.random() * 7) + 'px';
+                    sparkle.style.height = sparkle.style.width;
+                    card.appendChild(sparkle);
+                }
+            }
+
+            // 音乐提示
+            function showMusicToast() {
+                musicToast.style.opacity = '1';
+                clearTimeout(musicToastTimer);
+                musicToastTimer = setTimeout(() => {
+                    musicToast.style.opacity = '0';
+                }, 2500);
+            }
+
+            function hideMusicToast() {
+                musicToast.style.opacity = '0';
+                clearTimeout(musicToastTimer);
+            }
+
+            // 使用Web Audio API生成简单的生日快乐旋律
+            function playHappyBirthdayMelody() {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioContext) return;
+                    const ctx = new AudioContext();
+
+                    // 生日快乐歌的音符频率 (简化版)
+                    const notes = [
+                        { freq: 261.63, dur: 0.3 }, // C - 祝
+                        { freq: 261.63, dur: 0.3 }, // C - 你
+                        { freq: 293.66, dur: 0.4 }, // D - 生
+                        { freq: 261.63, dur: 0.4 }, // C - 日
+                        { freq: 349.23, dur: 0.4 }, // F - 快
+                        { freq: 329.63, dur: 0.6 }, // E - 乐
+                        { freq: 0, dur: 0.2 }, // 休止
+                        { freq: 261.63, dur: 0.3 }, // C
+                        { freq: 261.63, dur: 0.3 }, // C
+                        { freq: 293.66, dur: 0.4 }, // D
+                        { freq: 261.63, dur: 0.4 }, // C
+                        { freq: 392.00, dur: 0.4 }, // G
+                        { freq: 349.23, dur: 0.6 }, // F
+                        { freq: 0, dur: 0.2 },
+                        { freq: 261.63, dur: 0.3 }, // C
+                        { freq: 261.63, dur: 0.3 }, // C
+                        { freq: 523.25, dur: 0.4 }, // C5
+                        { freq: 440.00, dur: 0.4 }, // A
+                        { freq: 349.23, dur: 0.4 }, // F
+                        { freq: 329.63, dur: 0.4 }, // E
+                        { freq: 293.66, dur: 0.7 }, // D
+                        { freq: 0, dur: 0.3 },
+                        { freq: 466.16, dur: 0.3 }, // Bb
+                        { freq: 466.16, dur: 0.3 }, // Bb
+                        { freq: 440.00, dur: 0.4 }, // A
+                        { freq: 349.23, dur: 0.4 }, // F
+                        { freq: 392.00, dur: 0.4 }, // G
+                        { freq: 349.23, dur: 0.7 }, // F
+                    ];
+
+                    let time = ctx.currentTime;
+                    notes.forEach(note => {
+                        if (note.freq > 0) {
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.type = 'sine';
+                            osc.frequency.value = note.freq;
+                            gain.gain.setValueAtTime(0.25, time);
+                            gain.gain.exponentialRampToValueAtTime(0.001, time + note.dur);
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.start(time);
+                            osc.stop(time + note.dur);
+                        }
+                        time += note.dur;
+                    });
+                } catch (e) {
+                    console.log('音频播放需要用户交互', e);
+                }
+            }
+
+            // 事件监听
+            function setupEventListeners() {
+                // 预览更新按钮
+                btnPreview.addEventListener('click', () => {
+                    updateCardDisplay();
+                    updateParticles();
+                    updateGlowBorder();
+                    createSparkles();
+                    saveToLocalStorage();
+                    // 小动画反馈
+                    card.style.transform = 'scale(1.03)';
+                    setTimeout(() => { card.style.transform = 'scale(1)'; }, 200);
+                    // 如果开启了音乐提示
+                    if (musicHintToggle.checked) {
+                        showMusicToast();
+                        playHappyBirthdayMelody();
+                    }
+                });
+
+                // 重置按钮
+                btnReset.addEventListener('click', () => {
+                    recipientInput.value = defaults.recipient;
+                    messageInput.value = defaults.message;
+                    signatureInput.value = defaults.signature;
+                    ageInput.value = defaults.age;
+                    iconSelect.value = defaults.icon;
+                    setTheme(defaults.theme);
+                    particlesToggle.checked = defaults.particles;
+                    musicHintToggle.checked = defaults.musicHint;
+                    glowBorderToggle.checked = defaults.glowBorder;
+                    updateCardDisplay();
+                    updateParticles();
+                    updateGlowBorder();
+                    createSparkles();
+                    saveToLocalStorage();
+                    hideMusicToast();
+                    card.style.transform = 'scale(1.04)';
+                    setTimeout(() => { card.style.transform = 'scale(1)'; }, 250);
+                });
+
+                // 截图提示按钮
+                btnScreenshot.addEventListener('click', () => {
+                    alert(
+                        '📸 截图保存方法：\n\n• Windows: 按 Win+Shift+S\n• Mac: 按 Cmd+Shift+4\n• 或按 Ctrl+P 打印/保存为PDF\n\n调整好卡片后即可截图分享给朋友！');
+                });
+
+                // 主题按钮
+                themeButtons.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.theme-btn');
+                    if (!btn) return;
+                    const theme = btn.getAttribute('data-theme');
+                    setTheme(theme);
+                    updateDynamicStyles();
+                    updateParticles();
+                    createSparkles();
+                    saveToLocalStorage();
+                    card.style.transform = 'scale(1.02)';
+                    setTimeout(() => { card.style.transform = 'scale(1)'; }, 180);
+                });
+
+                // 粒子开关
+                particlesToggle.addEventListener('change', () => {
+                    updateParticles();
+                    saveToLocalStorage();
+                });
+
+                // 音乐提示开关
+                musicHintToggle.addEventListener('change', () => {
+                    if (musicHintToggle.checked) {
+                        showMusicToast();
+                        playHappyBirthdayMelody();
+                    } else {
+                        hideMusicToast();
+                    }
+                    saveToLocalStorage();
+                });
+
+                // 闪光边框开关
+                glowBorderToggle.addEventListener('change', () => {
+                    updateGlowBorder();
+                    saveToLocalStorage();
+                });
+
+                // 实时输入更新（失焦时保存）
+                [recipientInput, messageInput, signatureInput, ageInput, iconSelect].forEach(el => {
+                    el.addEventListener('change', () => {
+                        updateCardDisplay();
+                        saveToLocalStorage();
+                    });
+                    el.addEventListener('blur', () => {
+                        updateCardDisplay();
+                        saveToLocalStorage();
+                    });
+                });
+
+                // 双击卡片播放音乐
+                card.addEventListener('dblclick', () => {
+                    showMusicToast();
+                    playHappyBirthdayMelody();
+                });
+
+                // 窗口大小改变时重建粒子
+                let resizeDebounce;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeDebounce);
+                    resizeDebounce = setTimeout(() => {
+                        if (particlesToggle.checked) updateParticles();
+                    }, 500);
+                });
+            }
+
+            // 键盘快捷键
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'm' && e.ctrlKey) {
+                    e.preventDefault();
+                    musicHintToggle.checked = !musicHintToggle.checked;
+                    if (musicHintToggle.checked) {
+                        showMusicToast();
+                        playHappyBirthdayMelody();
+                    } else {
+                        hideMusicToast();
+                    }
+                    saveToLocalStorage();
+                }
+                if (e.key === 'p' && e.ctrlKey && e.shiftKey) {
+                    // Ctrl+Shift+P 触发预览
+                    e.preventDefault();
+                    btnPreview.click();
+                }
+            });
+
+            // 初始化
+            init();
+            updateDynamicStyles();
+
+            console.log('🎂 生日贺卡已就绪！');
+            console.log('💡 提示：');
+            console.log('  - 在右侧面板自定义贺卡内容');
+            console.log('  - 点击"预览更新"应用更改');
+            console.log('  - 双击贺卡播放生日快乐旋律');
+            console.log('  - Ctrl+M 切换音乐');
+            console.log('  - Ctrl+Shift+P 快速预览');
+            console.log('  - Ctrl+P 打印或保存PDF');
+            console.log('  - 所有设置自动保存到本地');
+        })();
+    </script>
+</body>
+</html>
