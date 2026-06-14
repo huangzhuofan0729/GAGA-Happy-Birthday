@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>嘎嘎生日快乐 | 来自卓凡的祝福</title>
+    <!-- Google Fonts & 清爽样式 -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- canvas-confetti 轻量彩带库 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* 避免拖动文字影响体验，但无伤大雅 */
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #ffe6f0 0%, #ffd9e8 30%, #fff0d4 100%);
+            font-family: 'Quicksand', 'Segoe UI', system-ui, -apple-system, 'Poppins', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* 背景漂浮容器 (气球&星星) */
+        .floating-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* 气球基本样式 */
+        .balloon {
+            position: absolute;
+            bottom: -150px;
+            font-size: 2.2rem;
+            pointer-events: none;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            z-index: 1;
+            white-space: nowrap;
+            will-change: transform;
+            animation: floatUp linear infinite, sway 3s ease-in-out infinite;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.1));
+            transition: transform 0.2s ease;
+        }
+
+        /* 上升动画 – 每个气球持续时间不同，通过JS动态调整 */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-130vh) translateX(calc(20px * var(--drift, 1))) rotate(8deg);
+                opacity: 0.2;
+            }
+        }
+
+        /* 左右轻微摇摆 */
+        @keyframes sway {
+            0% { transform: translateX(-6px) rotate(-3deg); }
+            50% { transform: translateX(8px) rotate(5deg); }
+            100% { transform: translateX(-6px) rotate(-3deg); }
+        }
+
+        /* 小星星闪烁特效 */
+        .star {
+            position: absolute;
+            background-color: #fff9c4;
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 8px #ffec9f;
+            pointer-events: none;
+            animation: twinkle 4s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0; transform: scale(0.5);}
+            100% { opacity: 1; transform: scale(1.1);}
+        }
+
+        /* 主卡片 – 毛玻璃质感 + 高级圆角 */
+        .birthday-card {
+            position: relative;
+            z-index: 20;
+            max-width: 680px;
+            width: 100%;
+            background: rgba(255, 250, 240, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 64px 48px 80px 48px;
+            box-shadow: 0 30px 50px rgba(255, 105, 135, 0.25), 0 10px 25px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.6);
+            padding: 2.2rem 2rem 2.8rem;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            text-align: center;
+            border: 1px solid rgba(255,245,220,0.9);
+        }
+
+        .birthday-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 35px 55px rgba(255, 90, 120, 0.35);
+        }
+
+        /* 装饰蛋糕区域 */
+        .cake-emoji {
+            font-size: 5.5rem;
+            line-height: 1;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.15));
+            margin-bottom: 0.25rem;
+            display: inline-block;
+            animation: bounceSoft 2s infinite ease;
+        }
+
+        @keyframes bounceSoft {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* 主标题 */
+        .greeting {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #ff577f;
+            letter-spacing: -0.01em;
+            margin: 0.5rem 0 0.2rem;
+            text-shadow: 3px 3px 0 #ffe0b5;
+            word-break: keep-all;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .greeting span {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF8C9E, #FF5E7E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: none;
+        }
+
+        .name-highlight {
+            font-size: 4rem;
+            background: linear-gradient(125deg, #FF3B6F, #FF9A8B);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .sub {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #b95f7a;
+            background: rgba(255,255,220,0.7);
+            display: inline-block;
+            padding: 0.2rem 1.5rem;
+            border-radius: 60px;
+            margin: 0.8rem 0 1rem;
+            backdrop-filter: blur(4px);
+        }
+
+        /* 祝福词文本 */
+        .message {
+            font-size: 1.18rem;
+            line-height: 1.55;
+            margin: 1.5rem 0;
+            color: #3d2b2b;
+            font-weight: 500;
+            background: rgba(255,235,215,0.5);
+            padding: 1.2rem 1rem;
+            border-radius: 48px;
+            backdrop-filter: blur(2px);
+        }
+
+        /* 卓凡署名区 */
+        .signature {
+            margin: 1rem 0 1.8rem;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #aa4e6c;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-top: 2px dashed #ffbfa6;
+            padding-top: 1.2rem;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .signature .name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #D96C8E, #B34464);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+        }
+
+        /* 互动按钮区 */
+        .action-btn {
+            background: linear-gradient(95deg, #FF896B, #FF5F6D);
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+            padding: 12px 28px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
+            transition: 0.2s;
+            box-shadow: 0 8px 18px rgba(255, 80, 100, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(2px);
+            margin-top: 0.5rem;
+        }
+
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* 额外彩蛋小提示 */
+        .hint {
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            color: #cb7e9b;
+            font-weight: 600;
+            background: rgba(255, 240, 210, 0.7);
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 99px;
+        }
+
+        /* 响应式处理 */
+        @media (max-width: 560px) {
+            .birthday-card {
+                padding: 1.5rem 1.2rem 2rem;
+                border-radius: 48px 36px 56px 36px;
+            }
+            .greeting {
+                font-size: 2.3rem;
+            }
+            .name-highlight {
+                font-size: 2.8rem;
+            }
+            .cake-emoji {
+                font-size: 4rem;
+            }
+            .message {
+                font-size: 1rem;
+                padding: 1rem;
+            }
+            .signature .name {
+                font-size: 1.4rem;
+            }
+            .action-btn {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+        }
+
+        /* 额外的光晕装饰 */
+        .glow-star {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 20% 40%, rgba(255,215,180,0.2) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #bb7a91;
+            background: rgba(255,245,235,0.5);
+            width: fit-content;
+            margin: 0 auto;
+            padding: 4px 18px;
+            border-radius: 60px;
+            backdrop-filter: blur(5px);
+            z-index: 30;
+            font-weight: 500;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="floating-container" id="floatingContainer">
+    <!-- 气球通过js动态生成，星星也是 -->
+</div>
+<div class="glow-star"></div>
+
+<main class="birthday-card">
+    <div class="cake-emoji">🎂✨🎈</div>
+    <div class="greeting">
+        <span>🎉 祝</span>
+        <span class="name-highlight">嘎嘎</span>
+        <span>生日快乐 🎉</span>
+    </div>
+    <div class="sub">✨ 诞辰欢愉 · 一生明朗 ✨</div>
+
+    <div class="message">
+        🌸 亲爱的嘎嘎，今天全世界都在为你发光！<br>
+        愿你的笑容像夏天的橘子汽水，永远甜滋滋冒泡；<br>
+        愿每一天都有不期而遇的惊喜和软绵绵的幸运。<br>
+        所有的美好都奔向你，快乐不止今天，而是岁岁年年 💖
+    </div>
+
+    <div class="signature">
+        💌 挚友 · <span class="name">卓凡</span> 敬上 💌
+    </div>
+
+    <button class="action-btn" id="celebrationBtn">
+        🎁 狂按撒花 · 为嘎嘎庆生 🎁
+    </button>
+    <div class="hint">
+        ✨ 点击任意地方 / 按钮 都会绽放烟花 ✨
+    </div>
+</main>
+<footer>💗 嘎嘎，你值得全世界的宠爱 💗</footer>
+
+<script>
+    (function() {
+        // ----------------------------- 气球生成模块 (浪漫氛围) -----------------------------
+        const container = document.getElementById('floatingContainer');
+        const BALLOON_COUNT = 24;      // 气球数量
+        const STAR_COUNT = 60;         // 闪烁星星数量
+
+        // 可爱气球Emoji & 备选图案 (增加生动感)
+        const balloonEmojis = ['🎈', '🎈', '🎈', '🎈', '🎈', '🎈', '🎈', '🎈', '🎈', '🎈', 
+                               '🌸', '⭐', '✨', '🍬', '🍭', '🕯️', '💖', '🎀', '🧸', '🎉'];
+
+        // 生成随机范围函数
+        function randomRange(min, max) {
+            return min + Math.random() * (max - min);
+        }
+
+        // 创建气球元素
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.classList.add('balloon');
+            // 随机选择 emoji (用气球为主，混入可爱小元素)
+            const randomIndex = Math.floor(Math.random() * balloonEmojis.length);
+            balloon.innerText = balloonEmojis[randomIndex];
+            
+            // 随机大小 (1.5rem ~ 3.5rem)
+            const size = randomRange(1.8, 3.8);
+            balloon.style.fontSize = `${size}rem`;
+            
+            // 随机左侧位置 (0% ~ 100%)
+            const leftPos = randomRange(0, 100);
+            balloon.style.left = `${leftPos}%`;
+            
+            // 随机上升持续时间 (7s ~ 16s) 不同速度更自然
+            const duration = randomRange(7, 16);
+            balloon.style.animationDuration = `${duration}s, ${randomRange(2.5, 4)}s`;
+            
+            // 随机延迟 (0 ~ 18s) 让气球错落出现
+            const delay = randomRange(0, 18);
+            balloon.style.animationDelay = `${delay}s, ${randomRange(0, 1.5)}s`;
+            
+            // 自定义漂移方向 (CSS 变量 --drift)
+            const driftVal = randomRange(-0.8, 0.8);
+            balloon.style.setProperty('--drift', driftVal);
+            
+            // 轻微随机透明度变化
+            balloon.style.opacity = randomRange(0.5, 0.95);
+            
+            return balloon;
+        }
+
+        // 批量生成气球
+        for (let i = 0; i < BALLOON_COUNT; i++) {
+            container.appendChild(createBalloon());
+        }
+
+        // 定期补充一些新气球 (让动态永续, 保证一直有飘浮感)
+        setInterval(() => {
+            // 偶尔删除超出过多的旧气球，防止dom太多，但总数量控制
+            const existingBalloons = document.querySelectorAll('.balloon');
+            if (existingBalloons.length < BALLOON_COUNT + 6) {
+                container.appendChild(createBalloon());
+            } else {
+                // 如果气球过多(超过40个)则移除最早的一个
+                if (existingBalloons.length > 45) {
+                    existingBalloons[0]?.remove();
+                }
+            }
+        }, 5000);
+        
+        // ----------------------------- 闪闪星光特效 -----------------------------
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            const sizeStar = randomRange(2, 8);  // px
+            star.style.width = `${sizeStar}px`;
+            star.style.height = `${sizeStar}px`;
+            star.style.left = `${randomRange(0, 100)}%`;
+            star.style.top = `${randomRange(0, 100)}%`;
+            star.style.animationDuration = `${randomRange(2, 6)}s`;
+            star.style.animationDelay = `${randomRange(0, 5)}s`;
+            star.style.background = `radial-gradient(circle, #fffac2, #ffe49e)`;
+            return star;
+        }
+
+        for (let i = 0; i < STAR_COUNT; i++) {
+            container.appendChild(createStar());
+        }
+        // 动态补充星星，让背景更灵动
+        setInterval(() => {
+            const starDivs = document.querySelectorAll('.star');
+            if (starDivs.length < 70) {
+                container.appendChild(createStar());
+            }
+        }, 8000);
+
+        // ----------------------------- 华丽烟花(canvas-confetti) 多重样式 -----------------------------
+        // 普通绽放烟花
+        function fireBasicConfetti() {
+            canvasConfetti({
+                particleCount: 140,
+                spread: 70,
+                origin: { y: 0.6 },
+                startVelocity: 18,
+                colors: ['#ff6b8b', '#ffb347', '#ff8c9e', '#ffd966', '#a4d8ff', '#f6a7c1'],
+                decay: 0.9,
+                ticks: 200
+            });
+        }
+        
+        // 左右纷飞彩带 (更有生日气氛)
+        function fireSideConfetti() {
+            canvasConfetti({
+                particleCount: 80,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.7 },
+                colors: ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEE6']
+            });
+            canvasConfetti({
+                particleCount: 80,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.7 },
+                colors: ['#FF9AA2', '#FFDAC1', '#B5EAD7', '#C7CEE6', '#FFB7B2']
+            });
+        }
+        
+        // 爆炸性 生日庆典核心烟花 (大量礼花)
+        function bigBirthdayBlast() {
+            const duration = 1800;
+            const end = Date.now() + duration;
+            const colors = ['#ff577f', '#ff9a5f', '#f7d44a', '#a0e7e5', '#ffb7b2', '#c0e0ff'];
+            
+            (function frame() {
+                canvasConfetti({
+                    particleCount: 3,
+                    angle: randomRange(55, 125),
+                    spread: randomRange(40, 85),
+                    origin: { x: randomRange(0.2, 0.8), y: randomRange(0.3, 0.8) },
+                    colors: [colors[Math.floor(Math.random() * colors.length)]],
+                    startVelocity: randomRange(12, 25),
+                    gravity: 1,
+                    drift: randomRange(-0.5, 0.5),
+                    ticks: 160
+                });
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+            
+            // 加一波中心高密度喷射
+            canvasConfetti({
+                particleCount: 220,
+                spread: 100,
+                origin: { y: 0.65, x: 0.5 },
+                startVelocity: 22,
+                colors: ['#FF5E7E', '#FFB347', '#FFD966', '#77DD77', '#B0D9FF'],
+                scalar: 1.2
+            });
+        }
+        
+        // 组合庆典烟花 (全方面)
+        function fullCelebration() {
+            fireBasicConfetti();
+            fireSideConfetti();
+            setTimeout(() => {
+                bigBirthdayBlast();
+            }, 120);
+            setTimeout(() => {
+                canvasConfetti({
+                    particleCount: 300,
+                    spread: 110,
+                    origin: { y: 0.5, x: 0.3 },
+                    startVelocity: 25,
+                    colors: ['#ff9eb5', '#ffcf9a', '#ffe0a3']
+                });
+                canvasConfetti({
+                    particleCount: 300,
+                    spread: 110,
+                    origin: { y: 0.5, x: 0.7 },
+                    startVelocity: 25,
+                });
+            }, 280);
+        }
+        
+        // 给用户惊喜加载时自动绽放一波 (小型的祝福开场礼花)
+        setTimeout(() => {
+            fireBasicConfetti();
+            setTimeout(() => {
+                fireSideConfetti();
+            }, 200);
+            setTimeout(() => {
+                canvasConfetti({
+                    particleCount: 180,
+                    spread: 85,
+                    origin: { y: 0.6 },
+                    startVelocity: 20,
+                    colors: ['#FF8C9E', '#FFB347', '#FFCD94']
+                });
+            }, 500);
+        }, 300);
+        
+        // ----------------------------- 交互区域: 按钮 & 卡片背景点击 -----------------------------
+        const btn = document.getElementById('celebrationBtn');
+        // 按钮点击狂欢
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fullCelebration();
+            // 添加微小视觉反馈
+            btn.style.transform = 'scale(0.97)';
+            setTimeout(() => { btn.style.transform = ''; }, 120);
+            // 额外显示一个甜甜的提示(toast风格)
+            showFloatyMessage('🎂 嘎嘎，生日快乐！卓凡为你喝彩 🎂');
+        });
+        
+        // 点击卡片任何地方也触发烟花 (增加互动)
+        const card = document.querySelector('.birthday-card');
+        card.addEventListener('click', (e) => {
+            // 避免按钮点击重复触发两次
+            if(e.target === btn || btn.contains(e.target)) return;
+            fullCelebration();
+            // 优雅的小涟漪提示
+            showFloatyMessage('💞 被爱意包围的嘎嘎，幸福一整年 💞');
+        });
+        
+        // 页面背景双击也超大惊喜
+        document.body.addEventListener('dblclick', (e) => {
+            // 避开卡片内的双击过于频繁，但全部友好
+            fullCelebration();
+            bigBirthdayBlast();
+            showFloatyMessage('✨ 双重好运 ✨ 嘎嘎愿望都实现 ✨');
+        });
+        
+        // 漂浮小提示函数 (临时弹出小标签)
+        let toastTimer = null;
+        function showFloatyMessage(text) {
+            // 创建一个漂浮消息块
+            const msgDiv = document.createElement('div');
+            msgDiv.innerText = text;
+            msgDiv.style.position = 'fixed';
+            msgDiv.style.bottom = '25%';
+            msgDiv.style.left = '50%';
+            msgDiv.style.transform = 'translateX(-50%)';
+            msgDiv.style.backgroundColor = 'rgba(255, 230, 210, 0.95)';
+            msgDiv.style.backdropFilter = 'blur(8px)';
+            msgDiv.style.color = '#c23b5e';
+            msgDiv.style.fontWeight = 'bold';
+            msgDiv.style.padding = '10px 24px';
+            msgDiv.style.borderRadius = '60px';
+            msgDiv.style.fontSize = '1rem';
+            msgDiv.style.fontFamily = "'Quicksand', sans-serif";
+            msgDiv.style.zIndex = '9999';
+            msgDiv.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+            msgDiv.style.border = '1px solid #ffbc8c';
+            msgDiv.style.whiteSpace = 'nowrap';
+            msgDiv.style.pointerEvents = 'none';
+            msgDiv.style.letterSpacing = '1px';
+            document.body.appendChild(msgDiv);
+            
+            setTimeout(() => {
+                msgDiv.style.transition = 'opacity 0.5s';
+                msgDiv.style.opacity = '0';
+                setTimeout(() => {
+                    msgDiv.remove();
+                }, 500);
+            }, 1800);
+        }
+        
+        // 额外的动态祝福：在控制台打印可爱消息 (送给爱抠细节的嘎嘎)
+        console.log("%c🎂 祝嘎嘎生日快乐！卓凡永远祝福你！🎂", "color: #ff5e7e; font-size: 16px; font-weight: bold;");
+        console.log("%c愿你的每一天都像今天的烟火一样绚烂✨", "color: #ff9a5f; font-size: 13px;");
+        
+        // 动态改变卡片背景阴影 轻微呼吸效果
+        let breathDirection = 1;
+        setInterval(() => {
+            const currentShadow = getComputedStyle(card).boxShadow;
+            let newOpacity = 0.25;
+            // 只做简单氛围变化不侵入主逻辑
+            card.style.transition = 'box-shadow 0.8s ease';
+            if (breathDirection > 0) {
+                card.style.boxShadow = '0 35px 50px rgba(255, 105, 135, 0.38), 0 8px 20px rgba(0,0,0,0.1)';
+            } else {
+                card.style.boxShadow = '0 25px 40px rgba(255, 105, 135, 0.22), 0 6px 14px rgba(0,0,0,0.08)';
+            }
+            breathDirection *= -1;
+        }, 2100);
+        
+        // 用鼠标轻轻移动时跟随粒子效果（可选但轻微）不需要太重，加分
+        document.body.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.96) {
+                // 偶尔飘一点碎花，随心
+                canvasConfetti({
+                    particleCount: 3,
+                    spread: 12,
+                    origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
+                    startVelocity: 6,
+                    colors: ['#ff9eb5', '#ffcf9a', '#FFC0CB'],
+                    gravity: 0.6,
+                    ticks: 90
+                });
+            }
+        });
+        
+        // 移动端触摸彩蛋（手指滑动也有轻烟花）
+        let touchTimeout;
+        document.body.addEventListener('touchmove', (e) => {
+            if (touchTimeout) return;
+            touchTimeout = setTimeout(() => {
+                const touch = e.touches[0];
+                if (touch) {
+                    canvasConfetti({
+                        particleCount: 8,
+                        spread: 25,
+                        origin: { x: touch.clientX / window.innerWidth, y: touch.clientY / window.innerHeight },
+                        startVelocity: 7,
+                        colors: ['#FFB7B2', '#FFDAC1', '#C7CEE6'],
+                        decay: 0.8
+                    });
+                }
+                touchTimeout = null;
+            }, 60);
+        });
+        
+        // 补充温柔的滚动落花效果 安静
+        window.addEventListener('scroll', () => {
+            // 不做过多处理，降低性能开销
+        });
+    })();
+</script>
+</body>
+</html>
